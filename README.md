@@ -5,7 +5,7 @@ A decentralized messaging application built on Ethereum blockchain. Users can se
 
 
 
-https://github.com/user-attachments/assets/f828c2f6-a48c-441e-8eb1-141e79698ec4
+![2025-12-02 10-56-05 (3)](https://github.com/user-attachments/assets/645f3c01-d223-4c64-8408-9ea712b195fa)
 
 
 
