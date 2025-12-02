@@ -2,6 +2,9 @@
 
 A decentralized messaging application built on Ethereum blockchain. Users can send messages with transaction records stored permanently on-chain, featuring a modern web interface with real-time updates.
 
+
+
+
 ## Features
 
 - On-chain message storage with sender and receiver addresses
