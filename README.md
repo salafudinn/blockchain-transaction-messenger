@@ -5,6 +5,10 @@ A decentralized messaging application built on Ethereum blockchain. Users can se
 
 
 
+https://github.com/user-attachments/assets/f828c2f6-a48c-441e-8eb1-141e79698ec4
+
+
+
 ## Features
 
 - On-chain message storage with sender and receiver addresses
