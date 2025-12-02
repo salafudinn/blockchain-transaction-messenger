@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - Blockchain Messenger</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 60% 40%;
+            gap: 2rem;
+            height: calc(100vh - 4rem);
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .emoji {
+            font-size: 1.75rem;
+        }
+
+        /* Left Section - Transaction History */
+        .history-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .transactions-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        .transactions-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .transactions-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .transactions-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        .transaction-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .transaction-card:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        .tx-addresses {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .address-box {
+            flex: 1;
+        }
+
+        .address-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #a78bfa;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .address {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #e0e7ff;
+            background: rgba(139, 92, 246, 0.15);
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            word-break: break-all;
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            color: #8b5cf6;
+            flex-shrink: 0;
+        }
+
+        .tx-message {
+            background: rgba(139, 92, 246, 0.1);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid #8b5cf6;
+        }
+
+        .message-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #a78bfa;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+        }
+
+        .message-text {
+            color: #e0e7ff;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .tx-timestamp {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            text-align: right;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #9ca3af;
+        }
+
+        .empty-state .emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Right Section - Transaction Form */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #e0e7ff;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 0.875rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .send-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+        }
+
+        .send-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .send-button:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .status-box {
+            margin-top: 1rem;
+            padding: 0.875rem;
+            background: rgba(59, 130, 246, 0.15);
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+            font-size: 0.875rem;
+            color: #93c5fd;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-box.error {
+            background: rgba(239, 68, 68, 0.15);
+            border-left-color: #ef4444;
+            color: #fca5a5;
+        }
+
+        .status-box.success {
+            background: rgba(34, 197, 94, 0.15);
+            border-left-color: #22c55e;
+            color: #86efac;
+        }
+
+        .wallet-info {
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .wallet-label {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-bottom: 0.25rem;
+        }
+
+        .wallet-address {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #e0e7ff;
+            background: rgba(139, 92, 246, 0.15);
+            padding: 0.5rem;
+            border-radius: 6px;
+            word-break: break-all;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .history-section {
+                max-height: 500px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Left Section - Transaction History -->
+        <div class="section history-section">
+            <div class="section-header">
+                <span class="emoji">📜</span>
+                <h2>Riwayat Transaksi</h2>
+            </div>
+            <div class="transactions-list" id="transactionsList">
+                <div class="empty-state">
+                    <div class="emoji">📭</div>
+                    <p>Memuat riwayat transaksi...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section - Transaction Form -->
+        <div class="section form-section">
+            <div class="section-header">
+                <span class="emoji">💸</span>
+                <h2>Kirim Transaksi</h2>
+            </div>
+
+            <form id="transactionForm" onsubmit="sendTransaction(event)">
+                <div class="form-group">
+                    <label class="form-label" for="receiverAddress">Alamat Penerima</label>
+                    <input type="text" id="receiverAddress" class="form-input" placeholder="0x..." required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="messageText">Pesan</label>
+                    <textarea id="messageText" class="form-textarea" placeholder="Tulis pesan Anda di sini..."
+                        required></textarea>
+                </div>
+
+                <button type="submit" class="send-button" id="sendBtn">
+                    Kirim Transaksi
+                </button>
+            </form>
+
+            <div class="status-box" id="statusBox">
+                Connecting to wallet...
+            </div>
+
+            <div class="wallet-info">
+                <div class="wallet-label">Alamat Wallet Anda:</div>
+                <div class="wallet-address" id="walletAddress">-</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Ethers.js via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <script>
+        // REPLACE THIS WITH YOUR NEW DEPLOYED ADDRESS
+        const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+        const abi = [
+            "function sendTransaction(address _receiver, string memory _message) public",
+            "function getTransactionCount() public view returns (uint256)",
+            "function getTransaction(uint256 index) public view returns (address sender, address receiver, string memory message, uint256 timestamp)",
+            "function getAllTransactions() public view returns (tuple(address sender, address receiver, string message, uint256 timestamp)[])",
+            "event TransactionSent(address indexed sender, address indexed receiver, string message, uint256 timestamp)"
+        ];
+
+        let provider;
+        let signer;
+        let contract;
+        let userAddress;
+
+        async function init() {
+            const statusBox = document.getElementById("statusBox");
+
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Request account access
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                    provider = new ethers.BrowserProvider(window.ethereum);
+                    signer = await provider.getSigner();
+                    userAddress = await signer.getAddress();
+                    contract = new ethers.Contract(contractAddress, abi, signer);
+
+                    document.getElementById("walletAddress").innerText = userAddress;
+                    setStatus("Terhubung ke MetaMask", "success");
+
+                    await loadTransactions();
+
+                    // Listen for new transaction events
+                    contract.on("TransactionSent", (sender, receiver, message, timestamp) => {
+                        console.log("New transaction:", sender, receiver, message, timestamp);
+                        addTransactionCard(sender, receiver, message, timestamp, true);
+                    });
+
+                } catch (error) {
+                    console.error(error);
+                    setStatus("Gagal terhubung: " + error.message, "error");
+                }
+            } else {
+                setStatus("Silakan install MetaMask!", "error");
+            }
+        }
+
+        async function loadTransactions() {
+            const listEl = document.getElementById("transactionsList");
+
+            try {
+                const count = await contract.getTransactionCount();
+
+                if (count == 0) {
+                    listEl.innerHTML = `
+                        <div class="empty-state">
+                            <div class="emoji">📭</div>
+                            <p>Belum ada transaksi</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                listEl.innerHTML = "";
+
+                // Load all transactions (latest first)
+                for (let i = Number(count) - 1; i >= 0; i--) {
+                    const [sender, receiver, message, timestamp] = await contract.getTransaction(i);
+                    addTransactionCard(sender, receiver, message, timestamp, false);
+                }
+
+            } catch (err) {
+                console.error("Error loading transactions:", err);
+                listEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">⚠️</div>
+                        <p>Error memuat transaksi</p>
+                    </div>
+                `;
+            }
+        }
+
+        function addTransactionCard(sender, receiver, message, timestamp, prepend = true) {
+            const listEl = document.getElementById("transactionsList");
+
+            // Remove empty state if exists
+            const emptyState = listEl.querySelector(".empty-state");
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const card = document.createElement("div");
+            card.className = "transaction-card";
+
+            const date = new Date(Number(timestamp) * 1000);
+            const timeStr = date.toLocaleString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            card.innerHTML = `
+                <div class="tx-addresses">
+                    <div class="address-box">
+                        <div class="address-label">Pengirim</div>
+                        <div class="address">${formatAddress(sender)}</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="address-box">
+                        <div class="address-label">Penerima</div>
+                        <div class="address">${formatAddress(receiver)}</div>
+                    </div>
+                </div>
+                <div class="tx-message">
+                    <div class="message-label">Pesan</div>
+                    <div class="message-text">${escapeHtml(message)}</div>
+                </div>
+                <div class="tx-timestamp">${timeStr}</div>
+            `;
+
+            if (prepend) {
+                listEl.prepend(card);
+            } else {
+                listEl.appendChild(card);
+            }
+        }
+
+        function formatAddress(address) {
+            return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function sendTransaction(event) {
+            event.preventDefault();
+
+            const receiver = document.getElementById("receiverAddress").value;
+            const message = document.getElementById("messageText").value;
+            const btn = document.getElementById("sendBtn");
+
+            if (!ethers.isAddress(receiver)) {
+                setStatus("Alamat penerima tidak valid!", "error");
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                setStatus("Mengirim transaksi...", "");
+
+                const tx = await contract.sendTransaction(receiver, message);
+                setStatus("Menunggu konfirmasi...", "");
+
+                await tx.wait();
+
+                setStatus("Transaksi berhasil dikirim!", "success");
+
+                // Clear form
+                document.getElementById("receiverAddress").value = "";
+                document.getElementById("messageText").value = "";
+
+                // Transaction will be added automatically via event listener
+
+            } catch (err) {
+                console.error(err);
+                setStatus("Error: " + (err.reason || err.message), "error");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function setStatus(message, type = "") {
+            const statusBox = document.getElementById("statusBox");
+            statusBox.innerText = message;
+            statusBox.className = "status-box";
+            if (type) {
+                statusBox.classList.add(type);
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>

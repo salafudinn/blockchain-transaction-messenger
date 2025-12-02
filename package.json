@@ -1,0 +1,20 @@
+{
+  "name": "anti-gravity-project",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "http-server frontend -p 3000"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "http-server": "^14.1.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}
